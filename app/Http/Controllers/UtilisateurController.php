@@ -31,6 +31,14 @@ class UtilisateurController extends Controller
             $erreur="Login ou mot de passe inconnu";
             return view('formLogin',compact('erreur'));
         }
+    }
 
+    /**deco le visiteur authentifié
+     * @return vue home
+     */
+    public function signOut(){
+        $utilisateur=new Utilisateur();
+        $utilisateur->logout();
+        return view('home');
     }
 }

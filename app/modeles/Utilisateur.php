@@ -34,4 +34,8 @@ class Utilisateur extends Model
         return $connected;
     }
 
+    public function logout(){
+        Session::forget('id');
+    }
+
 }
