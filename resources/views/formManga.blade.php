@@ -1,3 +1,4 @@
+@extends('layouts.master')
 @section('content')
     {!! Form::open(['url' => 'validerManga','files' => true]) !!}
 <div class="col-md-12 well well-sm">
@@ -19,7 +20,6 @@
                     <!-- /* A compléter */ -->
                     @foreach($genres as $genre)
                         selected=""
-                        <!-- avant c'etait $manga->id_genre , ne marchait pas  $manga['id_genre']-->
                         <option value="{{$genre->id_genre}}"
                             @if($genre->id_genre == $manga->id_genre)
                                 selected="selected"
@@ -35,7 +35,16 @@
             <div class="col-md-3">
                 <select class='form-control' name='cbScenariste' required>  
                     <OPTION VALUE=0>Sélectionner un Scenariste</option>
-                    /* A compléter */
+                    <!-- /* A compléter */ -->
+                    @foreach($scenaristes as $scenariste)
+                        selected=""
+                        <option value="{{$scenariste->id_scenariste}}"
+                                @if($scenariste->id_scenariste == $manga->id_scenariste)
+                                selected="selected"
+                                @endif
+                        >
+                            {{$scenariste->nom_scenariste." ".$scenariste->prenom_scenariste}} </option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -44,14 +53,23 @@
             <div class="col-md-3">
                 <select class='form-control' name='cbDessinateur' required>
                     <OPTION VALUE=0>Sélectionner un Dessinateur</option>
-                    /* A compléter */
+                    <!-- /* A compléter */ -->
+                    @foreach($dessinateurs as $dessinateur)
+                        selected=""
+                        <option value="{{$dessinateur->id_dessinateur}}"
+                                @if($dessinateur->id_dessinateur == $manga->id_dessinateur)
+                                selected="selected"
+                                @endif
+                        >
+                            {{$dessinateur->nom_dessinateur." ".$dessinateur->prenom_dessinateur}} </option>
+                    @endforeach
                 </select>
             </div>
         </div>     
         <div class="form-group">
             <label class="col-md-3 control-label">Prix : </label>
             <div class="col-md-3">
-                <input type="text" name="prix" value="/* A compléter */" class="form-control" >
+                <input type="text" name="prix" value="{{$manga->prix}}" class="form-control" >
             </div>
         </div>
         <div class="form-group">

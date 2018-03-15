@@ -6,7 +6,7 @@ use App\modeles\Dessinateur;
 use App\modeles\Genre;
 use App\modeles\Manga;
 use App\modeles\Scenariste;
-use Illuminate\Http\Request;
+use Request;
 use Illuminate\Support\Facades\Session;
 
 class MangaController extends Controller
@@ -35,13 +35,15 @@ class MangaController extends Controller
      */
     public function getMangasGenre(){
         $erreur="";
-        $id_genre= (new Request)->input('cbGenre');
+        $id_genre= Request::input('cbGenre');  //le probleme est ici
         if($id_genre){
             $manga=new Manga();
             $mangas=$manga->getMangasGenre($id_genre);
+            //echo $id_genre;
             return view('listeMangas',compact('mangas','erreur'));
         } else{
             $erreur="Il faut selectioner un genre!";
+           // echo $erreur;
             Session::put('erreur',$erreur);
             return redirect('/listerGenres');
         }
@@ -74,5 +76,31 @@ class MangaController extends Controller
         return view('formManga',compact('manga','genres','dessinateurs',
             'scenaristes','titreVue','erreur'));
 
+    }
+
+
+    public function validateManga(){
+        $id_manga= Request::input('id_manga');
+        $id_dessinateur=Request::input('cdDessinateur');;
+        $prix=Request::input('prix');;
+        $id_scenariste=Request::input('cdScenariste');;
+        $titre=Request::input('titre');;
+        $id_genre=Request::input('cdGenre');;
+
+        if(Request::hasfile('couverture')){
+            $image=Request::file('couverture');
+            $couverture=$image->getClientOriginalName();
+            Request::file('couverture')->move(base_path().'/public/images/'.$couverture);
+        }else{
+            $couverture=Request::input('couvertureHidden');
+        }
+        $manga=new Manga();
+        try{
+            $manga->updateManga($id_manga,$titre,$couverture,$prix,$id_dessinateur,$id_genre,$id_scenariste);
+        }catch(Exception $ex) {
+            $erreur = $ex->getMessage();
+            return $this->updateManga($id_manga, $erreur);
+        }
+        return redirect('/listerMangas');
     }
 }
