@@ -91,7 +91,7 @@
             </div>           
         </div>
 	    <div class="col-md-6 col-md-offset-3">
-            /* A compléter : inclure la vue error */
+           @include('error')
         </div>
     </div>
 </div>

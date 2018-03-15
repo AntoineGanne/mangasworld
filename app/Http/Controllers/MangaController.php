@@ -7,6 +7,7 @@ use App\modeles\Genre;
 use App\modeles\Manga;
 use App\modeles\Scenariste;
 use Request;
+use Exception;
 use Illuminate\Support\Facades\Session;
 
 class MangaController extends Controller
@@ -81,25 +82,60 @@ class MangaController extends Controller
 
     public function validateManga(){
         $id_manga= Request::input('id_manga');
-        $id_dessinateur=Request::input('cdDessinateur');;
+        $id_dessinateur=Request::input('cbDessinateur');;
         $prix=Request::input('prix');;
-        $id_scenariste=Request::input('cdScenariste');;
+        $id_scenariste=Request::input('cbScenariste');;
         $titre=Request::input('titre');;
-        $id_genre=Request::input('cdGenre');;
+        $id_genre=Request::input('cbGenre');;
 
         if(Request::hasfile('couverture')){
             $image=Request::file('couverture');
             $couverture=$image->getClientOriginalName();
-            Request::file('couverture')->move(base_path().'/public/images/'.$couverture);
+            Request::file('couverture')->move(base_path().'/public/images/',$couverture);
         }else{
             $couverture=Request::input('couvertureHidden');
         }
         $manga=new Manga();
         try{
-            $manga->updateManga($id_manga,$titre,$couverture,$prix,$id_dessinateur,$id_genre,$id_scenariste);
+            if($id_manga>0){
+                $manga->updateManga($id_manga,$titre,$couverture,$prix,$id_dessinateur,$id_genre,$id_scenariste);
+            }else{
+                $manga->insertManga($titre,$couverture,$prix,$id_dessinateur,$id_genre,$id_scenariste);
+            }
         }catch(Exception $ex) {
-            $erreur = $ex->getMessage();
-            return $this->updateManga($id_manga, $erreur);
+            if($id_manga>0){
+                $erreur ="echec de la modification!";
+                if($prix <= 0) $erreur.=" prix négatif!!!!!";
+                return $this->updateManga($id_manga, $erreur);
+            }else{
+                $erreur ="echec de la modification!";
+                if($prix <= 0) $erreur.=" prix négatif!!!!!";
+                return $this->addManga($erreur);
+            }
+        }
+        return redirect('/listerMangas');
+    }
+
+    public function addManga($erreur=""){
+        $manga=new Manga();
+        $genre=new Genre();
+        $genres=$genre->getGenres();
+        $dessinateur=new Dessinateur();
+        $dessinateurs=$dessinateur->getDessinateurs();
+        $scenariste=new Scenariste();
+        $scenaristes=$scenariste->getScenaristes();
+        $titreVue="Ajout d'un Manga";
+        return view('formManga',compact('manga','genres','dessinateurs',
+            'scenaristes','titreVue','erreur'));
+    }
+
+    public function deleteManga($id_manga,$erreur=""){
+        $manga=new Manga();
+        try{
+            $manga->deleteManga($id_manga);
+        }catch(Exception $ex){
+            $erreur="echec de la suppresion";
+            return view('listeMangas',compact('mangas','erreur'));
         }
         return redirect('/listerMangas');
     }
